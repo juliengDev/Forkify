@@ -123,9 +123,10 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TIMEOUT_SEC = exports.API_URL = void 0;
+exports.TIMEOUT_SEC = exports.RES_PER_PAGE = exports.API_URL = void 0;
 var API_URL = exports.API_URL = 'https://forkify-api.herokuapp.com/api/v2/recipes/';
 var TIMEOUT_SEC = exports.TIMEOUT_SEC = 10;
+var RES_PER_PAGE = exports.RES_PER_PAGE = 10;
 },{}],"src/js/helper.js":[function(require,module,exports) {
 "use strict";
 
@@ -189,7 +190,7 @@ var getJSON = exports.getJSON = /*#__PURE__*/function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.state = exports.loadSearchResults = exports.loadRecipe = void 0;
+exports.state = exports.loadSearchResults = exports.loadRecipe = exports.getSearchResultsPage = void 0;
 var _config = require("./config.js");
 var _helper = require("./helper.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -199,8 +200,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 var state = exports.state = {
   recipe: {},
   search: {
+    page: 1,
     query: '',
-    results: []
+    results: [],
+    resultsPerPage: _config.RES_PER_PAGE
   }
 };
 var loadRecipe = exports.loadRecipe = /*#__PURE__*/function () {
@@ -280,6 +283,13 @@ var loadSearchResults = exports.loadSearchResults = /*#__PURE__*/function () {
     return _ref2.apply(this, arguments);
   };
 }();
+var getSearchResultsPage = exports.getSearchResultsPage = function getSearchResultsPage() {
+  var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : state.search.page;
+  state.search.page = page;
+  var start = (page - 1) * state.search.resultsPerPage;
+  var end = page * state.search.resultsPerPage;
+  return state.search.results.slice(start, end);
+};
 },{"./config.js":"src/js/config.js","./helper.js":"src/js/helper.js"}],"src/img/icons.svg":[function(require,module,exports) {
 module.exports = "/icons.ae3c38d5.svg";
 },{}],"src/js/views/View.js":[function(require,module,exports) {
@@ -18269,7 +18279,8 @@ var controlSearchResults = /*#__PURE__*/function () {
           return model.loadSearchResults(query);
         case 7:
           // 3) Render results
-          _resultsView.default.render(model.state.search.results);
+          // resultsView.render(model.state.search.results);
+          _resultsView.default.render(model.getSearchResultsPage(1));
           _context2.next = 13;
           break;
         case 10:
