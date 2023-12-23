@@ -4,14 +4,6 @@ import recipeView from './views/recipeView.js';
 import 'core-js/stable'; // polyfilling everything else
 import 'regenerator-runtime/runtime'; // polyfilling async/await
 
-const timeout = function (s) {
-  return new Promise(function (_, reject) {
-    setTimeout(function () {
-      reject(new Error(`Request took too long! Timeout after ${s} second`));
-    }, s * 1000);
-  });
-};
-
 // https://forkify-api.herokuapp.com/v2
 
 ///////////////////////////////////////
@@ -28,10 +20,10 @@ const controlRecipes = async function () {
     // 2) Rendering Recipe
     recipeView.render(recipe);
   } catch (err) {
-    alert(err);
+    console.error(err);
   }
 };
-controlRecipes();
-['hashchange', 'load'].forEach(event =>
-  window.addEventListener(event, controlRecipes)
-);
+const init = function () {
+  recipeView.addHandlerRender(controlRecipes);
+};
+init();
