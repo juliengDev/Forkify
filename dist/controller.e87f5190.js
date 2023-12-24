@@ -331,6 +331,34 @@ var View = exports.default = /*#__PURE__*/function () {
       this._parentElement.insertAdjacentHTML('afterbegin', markup);
     }
   }, {
+    key: "update",
+    value: function update(data) {
+      this._data = data;
+      var newMarkup = this._generateMarkup();
+      var newDOM = document.createRange().createContextualFragment(newMarkup);
+      var newElements = Array.from(newDOM.querySelectorAll('*'));
+      var curElements = Array.from(this._parentElement.querySelectorAll('*'));
+      // console.log(curElements);
+      // console.log(newElements);
+
+      newElements.forEach(function (newEl, i) {
+        var _newEl$firstChild;
+        var curEl = curElements[i];
+
+        // Updates changed TEXT
+        if (!newEl.isEqualNode(curEl) && ((_newEl$firstChild = newEl.firstChild) === null || _newEl$firstChild === void 0 ? void 0 : _newEl$firstChild.nodeValue.trim()) !== '') {
+          curEl.textContent = newEl.textContent;
+        }
+
+        // Updates changed ATTRIBUTES
+        if (!newEl.isEqualNode(curEl)) {
+          Array.from(newEl.attributes).forEach(function (attr) {
+            return curEl.setAttribute(attr.name, attr.value);
+          });
+        }
+      });
+    }
+  }, {
     key: "_clear",
     value: function _clear() {
       this._parentElement.innerHTML = '';
@@ -918,7 +946,8 @@ var ResultsView = /*#__PURE__*/function (_View) {
   }, {
     key: "_generateMarkupPreview",
     value: function _generateMarkupPreview(result) {
-      return "\n    <li class=\"preview\">\n      <a class=\"preview__link preview__link--active\" href=\"#".concat(result.id, "\">\n        <figure class=\"preview__fig\">\n          <img src=\"").concat(result.image, "\" alt=\"").concat(result.title, "\" />\n        </figure>\n        <div class=\"preview__data\">\n          <h4 class=\"preview__title\">").concat(result.title, "</h4>\n          <p class=\"preview__publisher\">").concat(result.publisher, "</p>\n          <div class=\"preview__user-generated\">\n            <svg>\n              <use href=\"").concat(_icons.default, "#icon-user\"></use>\n            </svg>\n          </div>\n        </div>\n      </a>\n    </li>");
+      var id = window.location.hash.slice(1);
+      return "\n    <li class=\"preview\">\n      <a class=\"preview__link ".concat(result.id === id ? 'preview__link--active' : '', "\" href=\"#").concat(result.id, "\">\n        <figure class=\"preview__fig\">\n          <img src=\"").concat(result.image, "\" alt=\"").concat(result.title, "\" />\n        </figure>\n        <div class=\"preview__data\">\n          <h4 class=\"preview__title\">").concat(result.title, "</h4>\n          <p class=\"preview__publisher\">").concat(result.publisher, "</p>\n          <div class=\"preview__user-generated\">\n            <svg>\n              <use href=\"").concat(_icons.default, "#icon-user\"></use>\n            </svg>\n          </div>\n        </div>\n      </a>\n    </li>");
     }
   }]);
   return ResultsView;
@@ -18334,23 +18363,27 @@ var controlRecipes = /*#__PURE__*/function () {
         case 4:
           // guard clauses
           _recipeView.default.renderSpinner();
+
+          // 0 Update results view to mark selected search result
+          _resultsView.default.update(model.getSearchResultsPage());
+
           // 1) Loading Recipe
-          _context.next = 7;
+          _context.next = 8;
           return model.loadRecipe(id);
-        case 7:
+        case 8:
           // 2) Rendering Recipe
           _recipeView.default.render(model.state.recipe);
-          _context.next = 13;
+          _context.next = 14;
           break;
-        case 10:
-          _context.prev = 10;
+        case 11:
+          _context.prev = 11;
           _context.t0 = _context["catch"](0);
           _recipeView.default.renderError();
-        case 13:
+        case 14:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[0, 10]]);
+    }, _callee, null, [[0, 11]]);
   }));
   return function controlRecipes() {
     return _ref.apply(this, arguments);
@@ -18409,7 +18442,8 @@ var controlServings = function controlServings(newServings) {
   // Update the recipe servings (in state)
   model.updateServings(newServings);
   // Update the recipe view
-  _recipeView.default.render(model.state.recipe);
+  // recipeView.render(model.state.recipe);
+  _recipeView.default.update(model.state.recipe);
 };
 var init = function init() {
   _recipeView.default.addHandlerRender(controlRecipes);
