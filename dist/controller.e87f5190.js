@@ -303,12 +303,16 @@ var updateServings = exports.updateServings = function updateServings(newServing
   });
   state.recipe.servings = newServings;
 };
+var persistBookmarks = function persistBookmarks(recipe) {
+  localStorage.setItem('bookmarks', JSON.stringify(state.bookmarks));
+};
 var addBookmark = exports.addBookmark = function addBookmark(recipe) {
   // Add bookmark
   state.bookmarks.push(recipe);
 
   // Mark current recipe as bookmark
   if (recipe.id === state.recipe.id) state.recipe.bookmarked = true;
+  persistBookmarks();
 };
 var deleteBookmark = exports.deleteBookmark = function deleteBookmark(id) {
   // Delete bookmark
@@ -320,7 +324,18 @@ var deleteBookmark = exports.deleteBookmark = function deleteBookmark(id) {
   // Mark current recipe as NOT bookmarked
 
   if (id === state.recipe.id) state.recipe.bookmarked = false;
+  persistBookmarks();
 };
+var init = function init() {
+  var storage = localStorage.getItem('bookmarks');
+  if (storage) state.bookmarks = JSON.parse(storage);
+};
+// init();
+
+var clearBookmarks = function clearBookmarks() {
+  localStorage.clear('bookmarks');
+};
+// clearBookmarks();
 },{"./config.js":"src/js/config.js","./helper.js":"src/js/helper.js"}],"src/img/icons.svg":[function(require,module,exports) {
 module.exports = "/icons.ae3c38d5.svg";
 },{}],"src/js/views/View.js":[function(require,module,exports) {
@@ -1022,7 +1037,7 @@ var ResultsView = /*#__PURE__*/function (_View) {
   _createClass(ResultsView, [{
     key: "_generateMarkup",
     value: function _generateMarkup() {
-      console.log(this._data);
+      // console.log(this._data);
       return this._data.map(function (result) {
         return _previewView.default.render(result, false);
       }).join('');
@@ -1147,9 +1162,14 @@ var BookmarksView = /*#__PURE__*/function (_View) {
     return _this;
   }
   _createClass(BookmarksView, [{
+    key: "addHandlerRender",
+    value: function addHandlerRender(handler) {
+      window.addEventListener('load', handler);
+    }
+  }, {
     key: "_generateMarkup",
     value: function _generateMarkup() {
-      console.log(this._data);
+      // console.log(this._data);
       return this._data.map(function (bookmark) {
         return _previewView.default.render(bookmark, false);
       }).join('');
@@ -18497,21 +18517,23 @@ var controlRecipes = /*#__PURE__*/function () {
 
           // 0 Update results view to mark selected search result
           _resultsView.default.update(model.getSearchResultsPage());
+          // 1) Updating bookmarks view
           _bookmarksView.default.update(model.state.bookmarks);
 
-          // 1) Loading Recipe
+          // 2) Loading Recipe
           _context.next = 9;
           return model.loadRecipe(id);
         case 9:
-          // 2) Rendering Recipe
+          // 3) Rendering Recipe
           _recipeView.default.render(model.state.recipe);
-          _context.next = 15;
+          _context.next = 16;
           break;
         case 12:
           _context.prev = 12;
           _context.t0 = _context["catch"](0);
           _recipeView.default.renderError();
-        case 15:
+          console.err(_context.t0);
+        case 16:
         case "end":
           return _context.stop();
       }
@@ -18585,7 +18607,11 @@ var controlAddBookmark = function controlAddBookmark() {
   // 3) Render bookmarks
   _bookmarksView.default.render(model.state.bookmarks);
 };
+var controlBookmarks = function controlBookmarks() {
+  _bookmarksView.default.render(model.state.bookmarks);
+};
 var init = function init() {
+  _bookmarksView.default.addHandlerRender(controlBookmarks);
   _recipeView.default.addHandlerRender(controlRecipes);
   _recipeView.default.addHandlerUpdateServings(controlServings);
   _recipeView.default.addHandlerAddBookmark(controlAddBookmark);
@@ -18618,7 +18644,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53188" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58461" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
