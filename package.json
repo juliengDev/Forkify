@@ -5,17 +5,18 @@
   "main": "index.html",
   "scripts": {
     "start": "parcel index.html",
-    "build": "parcel build index.html"
+    "build": "parcel build index.html --no-minify --out-dir ./dist"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "parcel-bundler": "^1.12.5",
-    "sass": "^1.69.5"
+    "sass": "^1.69.5",
+    "parcel": "^2.0.0-beta-1"
   },
   "dependencies": {
     "core-js": "^3.34.0",
     "fractional": "^1.0.0",
-    "regenerator-runtime": "^0.14.0"
+    "regenerator-runtime": "^0.14.0",
+    "parcel-bundler": "^1.12.5"
   }
 }
